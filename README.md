@@ -1,4 +1,4 @@
-# mbipm
+# MBIPM
 
 This repository contains the code necessary to build, simulate, and fit multi-species bioenergetic integral projection models.
 
