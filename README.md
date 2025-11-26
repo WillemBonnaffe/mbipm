@@ -16,7 +16,7 @@ If this does not work you may have to create an empty environment and install pa
 ```
 conda create -n mbipm python=3.10 numpy matplotlib seaborn jupyter
 conda activate mbipm
-conda install pytorch cpuonly -c pytorch 
+pip3 install torch torchvision
 ```
 Now you can open jupyter lab by running in the terminal the following command:
 
