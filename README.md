@@ -14,11 +14,15 @@ conda activate mbipm
 If this does not work you may have to create an empty environment and install packages manually:
 
 ```
-condra create env --name mbipm python=3.10
+conda create -n mbipm python=3.10 numpy matplotlib seaborn jupyter
 conda activate mbipm
-conda install pytorch
-conda install numpy
-conda install matplotlib
-conda install seaborn
-conda install 
+conda install pytorch cpuonly -c pytorch 
 ```
+Now you can open jupyter lab by running in the terminal the following command:
+
+```
+jupyter lab
+```
+
+You are ready to explore the notebooks.
+
