@@ -1,0 +1,117 @@
+rm(list=ls(all=TRUE))
+library(R2jags)
+
+data <- read.csv("elk_count_1923_2025_includes helo counts.csv",header=T,sep=',')
+#data <- read.csv("elk_count_1923_2025_excludes helo counts.csv",header=T,sep=',')
+
+sink("ssm.jags")
+cat("
+    model {
+    
+    #### Priors and constraints ###
+    
+    
+    x[1] ~ dnorm(log(11648), 0.01)       # Prior for initial population size
+    N[1] <- exp(x[1])
+    taub0 <- pow(0.09,-2) # 0.09 us the standard deviation of elk rmax values reported in Duncan et al. 2007
+    b0 ~ dnorm(0.263,taub0) #0.263 is the average rmax for elk rmax values reported in Duncan et al. 2007
+    taub1 <- pow(2,-2)
+    b1 ~ dnorm(0,taub1)I(-2,2)
+    
+    # Prior for the process variance - inverse gamma (0.001, 0.001)
+    # note that tauPro is 1/variance
+    tauPro ~ dgamma(0.001,0.001)
+    sigPro <- 1/pow(tauPro,0.5)
+    
+    # Prior for the observation variance - inverse gamma (0.001, 0.001)
+    # note that tauObs is 1/variance
+    tauObs ~ dgamma(0.001,0.001)
+    sigObs <- 1/pow(tauObs,0.5)
+    
+    
+    ### State-Space Model (the Likelihood) ###
+    # Observation process
+    for (t in 1:T) {
+    y[t] ~ dnorm(x[t],tauObs)   
+    }
+    
+    # State process
+    for (t in 2:T){
+    # Expected value of x[t]
+    Ex[t] <- x[t-1] + b0 + b1*x[t-1]
+    # Realized value of x[t] with process error
+    x[t] ~ dnorm(Ex[t],tauPro)
+    }
+    
+    # Output population sizes on real scale 
+    for (t in 2:T) {
+    N[t] <- exp(x[t])
+    }
+    }
+    ",fill = TRUE)
+sink()
+
+
+
+# Elk Population Counts
+
+count <- log(data[,2])
+
+year <- 1923:2025
+
+# Bundle data
+jags.data <- list(y = count, T = length(year))
+
+# Initial values
+inits <- function(){list(tauPro = 1, tauObs = 1, b0 = 0.26, b1 = -0.1, 
+                         x = c(rnorm(1, log(11648), 0.1),rep(NA,(length(year)-1))))}
+
+# Parameters monitored
+parameters <- c("b0","b1","sigPro","sigObs","N")
+
+# MCMC settings
+ni <- 150000
+nt <- 50
+nb <- 100000
+nc <- 3
+
+# Call JAGS from R
+set.seed(runif(1,1,999))  # sometimes this has to be reset
+ssm <- jags(jags.data,inits,parameters,"ssm.jags",n.chains = nc,
+            n.thin = nt,n.iter = ni,n.burnin = nb,working.directory = getwd())
+
+print(ssm, digits=3)
+
+#########################################################################################
+
+# Draw figure
+par(mfrow=c(1,1))
+fitted <- lower <- upper <- numeric()
+year <- 1923:2025
+n.years <- length(count)
+for (i in 1:n.years){
+  fitted[i] <- mean(ssm$BUGSoutput$sims.list$N[,i])
+  lower[i] <- quantile(ssm$BUGSoutput$sims.list$N[,i], 0.025)
+  upper[i] <- quantile(ssm$BUGSoutput$sims.list$N[,i], 0.975)}
+m1 <- min(c(fitted, count, lower), na.rm = TRUE)
+m2 <- max(c(fitted, count, upper), na.rm = TRUE)
+par(mar = c(4.5, 4, 1, 1))
+plot(0, 0, ylim = c(m1, m2), xlim = c(1, n.years), ylab = "", xlab = "", col = "black", type = "l", lwd = 2, axes = FALSE, frame = FALSE)
+axis(2, las = 1)
+axis(1, at = 1:n.years, labels = year)
+polygon(x = c(1:n.years, n.years:1), y = c(lower, upper[n.years:1]), col = "gray90", border = "gray90")
+points(exp(count))
+points(fitted, type = "l", col = "blue", lwd = 2)
+
+# Prepare data for export
+export_data <- data.frame(
+  Year = year[1:n.years],
+  Count = exp(count),
+  Prediction = fitted,
+  Lower95CI = lower,
+  Upper95CI = upper
+)
+
+# Export to CSV
+write.csv(export_data, "fitted_values.csv", row.names = FALSE)
+

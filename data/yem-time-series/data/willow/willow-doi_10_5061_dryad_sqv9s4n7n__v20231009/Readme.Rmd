@@ -1,0 +1,33 @@
+---
+title: "Yellowstone Data Readme"
+author: "Tom Hobbs"
+date: "2023-09-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Special thanks to the National Science Foundation
+
+Collection of the the data provided in this repository was supported by
+awards from the National Science Foundation to Colorado State University (DEB 0717367, 1147369, 1655035)
+
+#### Description of data collection
+
+Experimental and sampling designs as well as descriptions of data collection procedures can be found in
+Hobbs, N. T., D. B. Johnston, K. N. Marshall, E.C. Wolf, and D. J. Cooper. Does restoring apex predators to food webs restore ecosystems? Large carnivores in Yellowstone as a model system. Ecological Monographs. In press.
+
+#### Description of data files
+
+* fall_height_data_2001_2020.csv contains annual measurements of
+height of individual willows at the end of the growing season. Metadata are found in fall_height_data_metadata.pdf.
+
+* browsing_data_2003_2020.csv contains annual plant level observations
+of the number of stems browsed out of a sample of observed stems on
+individual willow plants during spring. Meta data are found in browsing_data_metadata.pdf
+
+* well_data_2002_2020.csv contains monthly measurements of water table
+depth during the growing season. Metadata are found in well_metadata.pdf
+

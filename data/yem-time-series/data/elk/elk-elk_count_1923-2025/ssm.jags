@@ -1,0 +1,44 @@
+
+    model {
+    
+    #### Priors and constraints ###
+    
+    
+    x[1] ~ dnorm(log(11648), 0.01)       # Prior for initial population size
+    N[1] <- exp(x[1])
+    taub0 <- pow(0.09,-2) # 0.09 us the standard deviation of elk rmax values reported in Duncan et al. 2007
+    b0 ~ dnorm(0.263,taub0) #0.263 is the average rmax for elk rmax values reported in Duncan et al. 2007
+    taub1 <- pow(2,-2)
+    b1 ~ dnorm(0,taub1)I(-2,2)
+    
+    # Prior for the process variance - inverse gamma (0.001, 0.001)
+    # note that tauPro is 1/variance
+    tauPro ~ dgamma(0.001,0.001)
+    sigPro <- 1/pow(tauPro,0.5)
+    
+    # Prior for the observation variance - inverse gamma (0.001, 0.001)
+    # note that tauObs is 1/variance
+    tauObs ~ dgamma(0.001,0.001)
+    sigObs <- 1/pow(tauObs,0.5)
+    
+    
+    ### State-Space Model (the Likelihood) ###
+    # Observation process
+    for (t in 1:T) {
+    y[t] ~ dnorm(x[t],tauObs)   
+    }
+    
+    # State process
+    for (t in 2:T){
+    # Expected value of x[t]
+    Ex[t] <- x[t-1] + b0 + b1*x[t-1]
+    # Realized value of x[t] with process error
+    x[t] ~ dnorm(Ex[t],tauPro)
+    }
+    
+    # Output population sizes on real scale 
+    for (t in 2:T) {
+    N[t] <- exp(x[t])
+    }
+    }
+    
