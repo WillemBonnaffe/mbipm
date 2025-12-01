@@ -1,4 +1,4 @@
-# mbipm
+# MBIPM
 
 This repository contains the code necessary to build, simulate, and fit multi-species bioenergetic integral projection models.
 
@@ -9,7 +9,7 @@ First make sure that you have installed Python and Anaconda for managing virtual
 To install the environment required for running the model run the following commands:
 
 ```
-conda env create --name mbipm --file=environments.yml
+conda env create --name mbipm --file=environment.yml
 conda activate mbipm
 ```
 
