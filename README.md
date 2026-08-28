@@ -1,4 +1,4 @@
-# MBIPM
+# Eco-IPM
 
 This repository contains the code necessary to build, simulate, and fit multi-species bioenergetic integral projection models.
 
@@ -9,15 +9,15 @@ First make sure that you have installed Python and Anaconda for managing virtual
 To install the environment required for running the model run the following commands:
 
 ```
-conda env create --name mbipm --file=environment.yml
-conda activate mbipm
+conda env create --name ecoipm --file=environment.yml
+conda activate ecoipm
 ```
 
 If this does not work you may have to create an empty environment and install packages manually:
 
 ```
-conda create -n mbipm python=3.10 numpy matplotlib seaborn jupyter
-conda activate mbipm
+conda create -n ecoipm python=3.10 numpy matplotlib seaborn jupyter
+conda activate ecoipm
 pip3 install torch torchvision
 ```
 Now you can open jupyter lab by running in the terminal the following command:
